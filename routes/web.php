@@ -10,7 +10,25 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $user = Illuminate\Support\Facades\Auth::user();
+    
+    if ($user->isAdmin()) {
+        // Admin: Vê os agendamentos de hoje
+        $appointments = App\Models\Appointment::with(['user', 'service'])
+            ->whereDate('appointment_date', \Carbon\Carbon::today())
+            ->orderBy('appointment_date')
+            ->get();
+    } else {
+        // Cliente: Vê seus próximos agendamentos limitados a 5
+        $appointments = App\Models\Appointment::with('service')
+            ->where('user_id', $user->id)
+            ->where('appointment_date', '>=', \Carbon\Carbon::now())
+            ->orderBy('appointment_date')
+            ->take(5)
+            ->get();
+    }
+
+    return view('dashboard', compact('appointments'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
