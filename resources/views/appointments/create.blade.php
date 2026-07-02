@@ -8,6 +8,18 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-barber-card overflow-hidden shadow-sm sm:rounded-lg border border-barber-gold/20 p-6">
+                
+                {{-- Exibição de erros de validação --}}
+                @if ($errors->any())
+                    <div class="mb-4 bg-red-900/50 border border-red-500 text-red-200 p-4 rounded">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <form action="{{ route('appointments.store') }}" method="POST">
                     @csrf
                     <div class="mb-4">
@@ -21,7 +33,6 @@
 
                     <div class="mb-4">
                         <label class="block text-barber-gold mb-2">Data e Hora</label>
-                        {{-- O atributo min impede que o usuário selecione uma data no passado --}}
                         <input type="datetime-local" 
                                name="appointment_date" 
                                min="{{ date('Y-m-d\TH:i') }}" 

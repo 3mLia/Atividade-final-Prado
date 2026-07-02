@@ -18,11 +18,13 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Rotas de Serviços
-    Route::resource('services', ServiceController::class);
-
-    // Rotas de Agendamentos
+    // Rotas de Agendamentos (Acessíveis por clientes e administradores)
     Route::resource('appointments', AppointmentController::class)->except(['edit', 'update']);
+
+    // Rotas de Serviços (PROTEGIDAS: Apenas Admins)
+    Route::middleware('admin')->group(function () {
+        Route::resource('services', ServiceController::class);
+    });
 });
 
 require __DIR__.'/auth.php';
