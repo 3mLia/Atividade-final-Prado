@@ -23,7 +23,7 @@
                     <thead>
                         <tr class="text-barber-gold border-b border-barber-gold/20">
                             <th class="p-3">Serviço</th>
-                            <th class="p-3">Data/Hora</th>
+                            <th class="p-3">Data e Hora</th>
                             <th class="p-3">Status</th>
                             <th class="p-3 text-right">Ações</th>
                         </tr>
@@ -32,7 +32,8 @@
                         @forelse($appointments as $appointment)
                             <tr class="border-b border-barber-gold/10">
                                 <td class="p-3">{{ $appointment->service->name }}</td>
-                                <td class="p-3">{{ $appointment->appointment_date->format('d/m/Y H:i') }}</td>
+                                {{-- Exibição no padrão brasileiro: dia/mês às horas:minutos --}}
+                                <td class="p-3">{{ $appointment->appointment_date->format('d/m \à\s H:i') }}</td>
                                 <td class="p-3 capitalize">{{ $appointment->status }}</td>
                                 <td class="p-3 text-right">
                                     <form action="{{ route('appointments.destroy', $appointment) }}" method="POST">

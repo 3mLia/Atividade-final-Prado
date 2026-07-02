@@ -18,6 +18,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Rota da API para checar horários ocupados
+    Route::get('/appointments/check-availability', [AppointmentController::class, 'checkAvailability'])->name('appointments.checkAvailability');
+
     // Rotas de Agendamentos (Acessíveis por clientes e administradores)
     Route::resource('appointments', AppointmentController::class)->except(['edit', 'update']);
 
