@@ -6,7 +6,9 @@ use App\Http\Controllers\AppointmentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    // Busca todos os serviços cadastrados para a vitrine
+    $services = \App\Models\Service::all();
+    return view('welcome', compact('services'));
 });
 
 Route::get('/dashboard', function () {

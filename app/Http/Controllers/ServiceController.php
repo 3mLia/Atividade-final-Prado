@@ -12,7 +12,6 @@ class ServiceController extends Controller
 {
     public function index(): View
     {
-        // Lista os serviços paginados (Skill 2)
         $services = Service::paginate(10);
         return view('services.index', compact('services'));
     }
@@ -24,10 +23,18 @@ class ServiceController extends Controller
 
     public function store(StoreServiceRequest $request): RedirectResponse
     {
-        // Salva no banco usando a validação do FormRequest
-        Service::create($request->validated());
+        $data = $request->validated();
+        
+        // Salva DIRETAMENTE na pasta public/uploads/services
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/services'), $filename);
+            $data['image_path'] = 'uploads/services/' . $filename;
+        }
 
-        // Redireciona com mensagem de sucesso (Skill 2)
+        Service::create($data);
+
         return redirect()->route('services.index')
             ->with('success', 'Serviço criado com sucesso!');
     }
@@ -39,7 +46,22 @@ class ServiceController extends Controller
 
     public function update(UpdateServiceRequest $request, Service $service): RedirectResponse
     {
-        $service->update($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('image')) {
+            // Remove a foto antiga da pasta public, se existir
+            if ($service->image_path && file_exists(public_path($service->image_path))) {
+                unlink(public_path($service->image_path));
+            }
+            
+            // Salva a nova foto
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/services'), $filename);
+            $data['image_path'] = 'uploads/services/' . $filename;
+        }
+
+        $service->update($data);
 
         return redirect()->route('services.index')
             ->with('success', 'Serviço atualizado com sucesso!');
@@ -47,6 +69,11 @@ class ServiceController extends Controller
 
     public function destroy(Service $service): RedirectResponse
     {
+        // Remove a foto da pasta public quando apagar o serviço
+        if ($service->image_path && file_exists(public_path($service->image_path))) {
+            unlink(public_path($service->image_path));
+        }
+        
         $service->delete();
 
         return redirect()->route('services.index')
